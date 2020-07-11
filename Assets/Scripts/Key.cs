@@ -22,6 +22,17 @@ public class Key : MonoBehaviour
     private void OnMouseDown()
     {
         // Debug.Log(keyValue);
-        taskManager.AddToPlayerString(keyValue);
+        if (keyValue == "-1")
+        {
+            taskManager.ResetPlayerString();
+        }
+        else if (keyValue == "10")
+        {
+            taskManager.FinishPlayerString();
+        }
+        else
+        {
+            taskManager.AddToPlayerString(keyValue);
+        }
     }
 }
