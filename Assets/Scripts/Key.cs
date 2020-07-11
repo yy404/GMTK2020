@@ -8,12 +8,14 @@ public class Key : MonoBehaviour
     public float clickForce = 1000;
 
     private TaskManager taskManager;
+    private AudioPlayer audioPlayer;
     private Rigidbody2D rb;
 
     // Start is called before the first frame update
     void Start()
     {
         taskManager = GameObject.FindWithTag("TaskManager").GetComponent<TaskManager>();
+        audioPlayer = GameObject.FindWithTag("AudioPlayer").GetComponent<AudioPlayer>();
         rb = GetComponent<Rigidbody2D>();
 
         clickForce = 1000;
@@ -27,6 +29,8 @@ public class Key : MonoBehaviour
 
     private void OnMouseDown()
     {
+        audioPlayer.PlayDTMF(keyValue);
+
         // Debug.Log(keyValue);
         if (keyValue == "-1")
         {

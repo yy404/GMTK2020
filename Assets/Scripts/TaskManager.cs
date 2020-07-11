@@ -13,9 +13,13 @@ public class TaskManager : MonoBehaviour
 
     private string playerString;
 
+    private AudioPlayer audioPlayer;
+
     // Start is called before the first frame update
     void Start()
     {
+        audioPlayer = GameObject.FindWithTag("AudioPlayer").GetComponent<AudioPlayer>();
+
         playerString = "";
 
         taskString = CreateNewTask(5);
@@ -45,12 +49,16 @@ public class TaskManager : MonoBehaviour
     {
         if (playerString == taskString)
         {
+            audioPlayer.PlaySuccess();
+
             Debug.Log("Score!");
             taskString = CreateNewTask(5);
             taskStringTMP.text = "Task: " + taskString;
         }
         else
         {
+            audioPlayer.PlayFailure();
+
             Debug.Log("Try again!");
         }
         ResetPlayerString();
