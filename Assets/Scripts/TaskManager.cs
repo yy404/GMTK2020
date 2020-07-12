@@ -8,15 +8,22 @@ public class TaskManager : MonoBehaviour
 {
     public TextMeshProUGUI playerStringTMP;
     public TextMeshProUGUI taskStringTMP;
-    public int contactsSize;
+    public int maxContactsSize;
+    public int minTimerCount;
+    public int maxTimerCount;
     public int digitsSize;
     public int prefixSize;
-    public int currentCounterValue;
 
-    private Dictionary<string, int> myContactsDict;
+    public GameObject singleContact;
+    public GameObject multipleContacts;
+
+    private Dictionary<string, GameObject> myContactsDict;
     private AudioPlayer audioPlayer;
     private string playerString;
     private float timerSeconds;
+    private int countSuccess;
+    private int contactsSize;
+
 
     // Start is called before the first frame update
     void Start()
@@ -25,31 +32,22 @@ public class TaskManager : MonoBehaviour
 
         playerString = "";
         timerSeconds = 1;
+        countSuccess = 0;
 
-        myContactsDict = new Dictionary<string, int>();
-        string prefixDigits = CreateContactNum(prefixSize);
-        for (int i = 0; i < contactsSize; i++)
-        {
-            AddNewContact(prefixDigits);
-        }
-        DisplayContacts();
+        contactsSize = 1;
+
+        myContactsDict = new Dictionary<string, GameObject>();
+        FillContacts();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (currentCounterValue > 0)
+        timerSeconds -= Time.deltaTime;
+        if (timerSeconds <= 0)
         {
-            timerSeconds -= Time.deltaTime;
-            if (timerSeconds <= 0)
-            {
-                DecreaseCounterValue();
-                timerSeconds = 1;
-            }
-        }
-        else
-        {
-            Debug.Log("Game over!");
+            DecreaseCounterValue();
+            timerSeconds = 1;
         }
     }
 
@@ -68,20 +66,27 @@ public class TaskManager : MonoBehaviour
 
     public void FinishPlayerString()
     {
-        int temp;
+        GameObject temp;
         if (myContactsDict.TryGetValue(playerString, out temp))
         {
             audioPlayer.PlaySuccess();
 
+            Destroy(myContactsDict[playerString]);
             myContactsDict.Remove(playerString);
 
             Debug.Log("Score!");
-            // AddNewContact();
-            DisplayContacts();
+            countSuccess++;
 
             if (myContactsDict.Count == 0)
             {
-                Debug.Log("Win!");
+                Debug.Log("Level up!");
+                contactsSize++;
+                if (contactsSize > maxContactsSize)
+                {
+                    Debug.Log("Win!");
+                    Debug.Log("Successfully made " + countSuccess.ToString() + " calls!");
+                }
+                FillContacts();
             }
         }
         else
@@ -106,19 +111,34 @@ public class TaskManager : MonoBehaviour
     private void AddNewContact(string thisPrefix)
     {
         string newContactNum = CreateContactNum(digitsSize-prefixSize);
-        int temp;
+        GameObject temp;
+
+        int maxIteration = 0;
         while (myContactsDict.TryGetValue(thisPrefix+newContactNum, out temp))
         {
             newContactNum = CreateContactNum(digitsSize-prefixSize);
+            maxIteration++;
+            if (maxIteration > 100)
+            {
+                break;
+            }
         }
-        myContactsDict[thisPrefix+newContactNum] = 1;
+
+        GameObject singleContactObject = Instantiate(singleContact, transform.position, Quaternion.identity);
+        singleContactObject.transform.SetParent(multipleContacts.transform,false);
+
+        string thisCountactNum = thisPrefix+newContactNum;
+        int thisTimerCount = Random.Range(minTimerCount, maxTimerCount+1);
+        singleContactObject.GetComponent<SingleContact>().Setup(thisCountactNum, thisTimerCount);
+
+        myContactsDict[thisCountactNum] = singleContactObject;
     }
 
     private void DisplayContacts()
     {
         taskStringTMP.text = "To call: " + "\n";
 
-        foreach(KeyValuePair<string,int> thisContact in myContactsDict)
+        foreach(KeyValuePair<string,GameObject> thisContact in myContactsDict)
         {
             // Debug.Log(thisContact.Key);
             // Debug.Log(thisContact.Value);
@@ -129,7 +149,28 @@ public class TaskManager : MonoBehaviour
 
     public void DecreaseCounterValue()
     {
-        currentCounterValue--;
-        Debug.Log(currentCounterValue);
+        foreach(KeyValuePair<string,GameObject> thisContact in myContactsDict)
+        {
+            // Debug.Log(thisContact.Key);
+            // Debug.Log(thisContact.Value);
+            thisContact.Value.GetComponent<SingleContact>().UpdateClock();
+        }
+    }
+
+    private void FillContacts()
+    {
+        string prefixDigits = CreateContactNum(prefixSize);
+
+        while (myContactsDict.Count < contactsSize)
+        {
+            AddNewContact(prefixDigits);
+        }
+    }
+
+    public void GameOver()
+    {
+        Time.timeScale = 0;
+        Debug.Log("Game over!");
+        Debug.Log("Successfully made " + countSuccess.ToString() + " calls!");
     }
 }
