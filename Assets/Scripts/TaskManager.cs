@@ -8,11 +8,12 @@ public class TaskManager : MonoBehaviour
 {
     public TextMeshProUGUI playerStringTMP;
     public TextMeshProUGUI taskStringTMP;
+    public int contactsSize;
+    public int digitsSize;
+    public int prefixSize;
 
-    public string taskString;
-
+    private Dictionary<string, int> myContactsDict;
     private string playerString;
-
     private AudioPlayer audioPlayer;
 
     // Start is called before the first frame update
@@ -22,8 +23,13 @@ public class TaskManager : MonoBehaviour
 
         playerString = "";
 
-        taskString = CreateNewTask(5);
-        taskStringTMP.text = "Contacts: " + taskString;
+        myContactsDict = new Dictionary<string, int>();
+        string prefixDigits = CreateContactNum(prefixSize);
+        for (int i = 0; i < contactsSize; i++)
+        {
+            AddNewContact(prefixDigits);
+        }
+        DisplayContacts();
     }
 
     // Update is called once per frame
@@ -47,13 +53,21 @@ public class TaskManager : MonoBehaviour
 
     public void FinishPlayerString()
     {
-        if (playerString == taskString)
+        int temp;
+        if (myContactsDict.TryGetValue(playerString, out temp))
         {
             audioPlayer.PlaySuccess();
 
+            myContactsDict.Remove(playerString);
+
             Debug.Log("Score!");
-            taskString = CreateNewTask(5);
-            taskStringTMP.text = "Contacts: " + taskString;
+            // AddNewContact();
+            DisplayContacts();
+
+            if (myContactsDict.Count == 0)
+            {
+                Debug.Log("Win!");
+            }
         }
         else
         {
@@ -64,7 +78,7 @@ public class TaskManager : MonoBehaviour
         ResetPlayerString();
     }
 
-    private string CreateNewTask(int digitsNum)
+    private string CreateContactNum(int digitsNum)
     {
         string res = "";
         for (int i = 0; i < digitsNum; i++)
@@ -72,5 +86,29 @@ public class TaskManager : MonoBehaviour
             res += Random.Range(0,10).ToString();
         }
         return res;
+    }
+
+    private void AddNewContact(string thisPrefix)
+    {
+        string newContactNum = CreateContactNum(digitsSize-prefixSize);
+        int temp;
+        while (myContactsDict.TryGetValue(thisPrefix+newContactNum, out temp))
+        {
+            newContactNum = CreateContactNum(digitsSize-prefixSize);
+        }
+        myContactsDict[thisPrefix+newContactNum] = 1;
+    }
+
+    private void DisplayContacts()
+    {
+        taskStringTMP.text = "Contacts: " + "\n";
+
+        foreach(KeyValuePair<string,int> thisContact in myContactsDict)
+        {
+            // Debug.Log(thisContact.Key);
+            // Debug.Log(thisContact.Value);
+            taskStringTMP.text += thisContact.Key;
+            taskStringTMP.text += "\n";
+        }
     }
 }

@@ -1026,7 +1026,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerStringTMP: {fileID: 62029914}
   taskStringTMP: {fileID: 2008708917}
-  taskString: 12321
+  contactsSize: 5
+  digitsSize: 5
+  prefixSize: 3
 --- !u!1 &680825348
 GameObject:
   m_ObjectHideFlags: 0
