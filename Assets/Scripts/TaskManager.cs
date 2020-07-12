@@ -23,7 +23,7 @@ public class TaskManager : MonoBehaviour
         playerString = "";
 
         taskString = CreateNewTask(5);
-        taskStringTMP.text = "Task: " + taskString;
+        taskStringTMP.text = "Contacts: " + taskString;
     }
 
     // Update is called once per frame
@@ -36,13 +36,13 @@ public class TaskManager : MonoBehaviour
     {
         playerString += thisString;
         // Debug.Log(playerString);
-        playerStringTMP.text = "Player: " + playerString;
+        playerStringTMP.text = "Call: " + playerString;
     }
 
     public void ResetPlayerString()
     {
         playerString = "";
-        playerStringTMP.text = "Player: " + playerString;
+        playerStringTMP.text = "Call: " + playerString;
     }
 
     public void FinishPlayerString()
@@ -53,7 +53,7 @@ public class TaskManager : MonoBehaviour
 
             Debug.Log("Score!");
             taskString = CreateNewTask(5);
-            taskStringTMP.text = "Task: " + taskString;
+            taskStringTMP.text = "Contacts: " + taskString;
         }
         else
         {
