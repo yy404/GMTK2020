@@ -11,10 +11,12 @@ public class TaskManager : MonoBehaviour
     public int contactsSize;
     public int digitsSize;
     public int prefixSize;
+    public int currentCounterValue;
 
     private Dictionary<string, int> myContactsDict;
-    private string playerString;
     private AudioPlayer audioPlayer;
+    private string playerString;
+    private float timerSeconds;
 
     // Start is called before the first frame update
     void Start()
@@ -22,6 +24,7 @@ public class TaskManager : MonoBehaviour
         audioPlayer = GameObject.FindWithTag("AudioPlayer").GetComponent<AudioPlayer>();
 
         playerString = "";
+        timerSeconds = 1;
 
         myContactsDict = new Dictionary<string, int>();
         string prefixDigits = CreateContactNum(prefixSize);
@@ -35,20 +38,32 @@ public class TaskManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        if (currentCounterValue > 0)
+        {
+            timerSeconds -= Time.deltaTime;
+            if (timerSeconds <= 0)
+            {
+                DecreaseCounterValue();
+                timerSeconds = 1;
+            }
+        }
+        else
+        {
+            Debug.Log("Game over!");
+        }
     }
 
     public void AddToPlayerString(string thisString)
     {
         playerString += thisString;
         // Debug.Log(playerString);
-        playerStringTMP.text = "Call: " + playerString;
+        playerStringTMP.text = "Calling: " + playerString;
     }
 
     public void ResetPlayerString()
     {
         playerString = "";
-        playerStringTMP.text = "Call: " + playerString;
+        playerStringTMP.text = "Calling: " + playerString;
     }
 
     public void FinishPlayerString()
@@ -101,7 +116,7 @@ public class TaskManager : MonoBehaviour
 
     private void DisplayContacts()
     {
-        taskStringTMP.text = "Contacts: " + "\n";
+        taskStringTMP.text = "To call: " + "\n";
 
         foreach(KeyValuePair<string,int> thisContact in myContactsDict)
         {
@@ -110,5 +125,11 @@ public class TaskManager : MonoBehaviour
             taskStringTMP.text += thisContact.Key;
             taskStringTMP.text += "\n";
         }
+    }
+
+    public void DecreaseCounterValue()
+    {
+        currentCounterValue--;
+        Debug.Log(currentCounterValue);
     }
 }
