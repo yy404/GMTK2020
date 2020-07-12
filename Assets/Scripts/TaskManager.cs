@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class TaskManager : MonoBehaviour
 {
@@ -19,6 +20,7 @@ public class TaskManager : MonoBehaviour
     public GameObject multipleContacts;
     public GameObject panelRight;
     public Button startButton;
+    public Button restartButton;
     public GameObject keyPad;
 
     private Dictionary<string, GameObject> myContactsDict;
@@ -185,7 +187,7 @@ public class TaskManager : MonoBehaviour
             1.0f);
 
         keyPad.gameObject.SetActive(false);
-        startButton.gameObject.SetActive(true);
+        restartButton.gameObject.SetActive(true);
         menuTextTMP.text = "Game over!\n";
         menuTextTMP.text += "Expert level " + contactsSize.ToString() + "/" + maxContactsSize.ToString() + "!\n";
         menuTextTMP.text += "Successfully made " + countSuccess.ToString() + " calls!";
@@ -215,5 +217,10 @@ public class TaskManager : MonoBehaviour
         FillContacts();
 
         gameActive = true;
+    }
+
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
