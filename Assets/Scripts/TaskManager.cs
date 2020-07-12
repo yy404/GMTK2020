@@ -8,6 +8,7 @@ public class TaskManager : MonoBehaviour
 {
     public TextMeshProUGUI playerStringTMP;
     public TextMeshProUGUI taskStringTMP;
+    public TextMeshProUGUI menuTextTMP;
     public int maxContactsSize;
     public int minTimerCount;
     public int maxTimerCount;
@@ -16,6 +17,9 @@ public class TaskManager : MonoBehaviour
 
     public GameObject singleContact;
     public GameObject multipleContacts;
+    public GameObject panelRight;
+    public Button startButton;
+    public GameObject keyPad;
 
     private Dictionary<string, GameObject> myContactsDict;
     private AudioPlayer audioPlayer;
@@ -23,31 +27,26 @@ public class TaskManager : MonoBehaviour
     private float timerSeconds;
     private int countSuccess;
     private int contactsSize;
-
+    private bool gameActive;
 
     // Start is called before the first frame update
     void Start()
     {
         audioPlayer = GameObject.FindWithTag("AudioPlayer").GetComponent<AudioPlayer>();
-
-        playerString = "";
-        timerSeconds = 1;
-        countSuccess = 0;
-
-        contactsSize = 1;
-
-        myContactsDict = new Dictionary<string, GameObject>();
-        FillContacts();
+        gameActive = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        timerSeconds -= Time.deltaTime;
-        if (timerSeconds <= 0)
+        if (gameActive == true)
         {
-            DecreaseCounterValue();
-            timerSeconds = 1;
+            timerSeconds -= Time.deltaTime;
+            if (timerSeconds <= 0)
+            {
+                DecreaseCounterValue();
+                timerSeconds = 1;
+            }
         }
     }
 
@@ -74,17 +73,18 @@ public class TaskManager : MonoBehaviour
             Destroy(myContactsDict[playerString]);
             myContactsDict.Remove(playerString);
 
-            Debug.Log("Score!");
+            // Debug.Log("Score!");
             countSuccess++;
 
             if (myContactsDict.Count == 0)
             {
-                Debug.Log("Level up!");
+                // Debug.Log("Level up!");
                 contactsSize++;
                 if (contactsSize > maxContactsSize)
                 {
-                    Debug.Log("Win!");
-                    Debug.Log("Successfully made " + countSuccess.ToString() + " calls!");
+                    // Debug.Log("Win!");
+                    // Debug.Log("Successfully made " + countSuccess.ToString() + " calls!");
+                    GameOver();
                 }
                 FillContacts();
             }
@@ -93,7 +93,7 @@ public class TaskManager : MonoBehaviour
         {
             audioPlayer.PlayFailure();
 
-            Debug.Log("Try again!");
+            // Debug.Log("Try again!");
         }
         ResetPlayerString();
     }
@@ -169,8 +169,51 @@ public class TaskManager : MonoBehaviour
 
     public void GameOver()
     {
-        Time.timeScale = 0;
-        Debug.Log("Game over!");
-        Debug.Log("Successfully made " + countSuccess.ToString() + " calls!");
+        // Debug.Log("Game over!");
+        // Debug.Log("Successfully made " + countSuccess.ToString() + " calls!");
+
+        // Time.timeScale = 0;
+        gameActive = false;
+
+        Image panelRightImg = panelRight.GetComponent<Image>();
+
+        panelRightImg.color =
+            new Color(
+            panelRightImg.color.r,
+            panelRightImg.color.g,
+            panelRightImg.color.b,
+            1.0f);
+
+        keyPad.gameObject.SetActive(false);
+        startButton.gameObject.SetActive(true);
+        menuTextTMP.text = "Game over!\n";
+        menuTextTMP.text += "Expert level " + contactsSize.ToString() + "/" + maxContactsSize.ToString() + "!\n";
+        menuTextTMP.text += "Successfully made " + countSuccess.ToString() + " calls!";
+    }
+
+    public void StartGame()
+    {
+        Image panelRightImg = panelRight.GetComponent<Image>();
+
+        panelRightImg.color =
+            new Color(
+            panelRightImg.color.r,
+            panelRightImg.color.g,
+            panelRightImg.color.b,
+            0.08f);
+
+        keyPad.gameObject.SetActive(true);
+        startButton.gameObject.SetActive(false);
+
+        playerString = "";
+        timerSeconds = 1;
+        countSuccess = 0;
+
+        contactsSize = 1;
+
+        myContactsDict = new Dictionary<string, GameObject>();
+        FillContacts();
+
+        gameActive = true;
     }
 }
