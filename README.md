@@ -1,2 +1,9 @@
 # GMTK2020
- GMTK Game Jam 2020
+
+## Intro
+This is an entry for GMTK Game Jam 2020.
+
+## Further Works
+* Adjust difficulty settings
+* Mute sound
+* provide more information about remaining time
